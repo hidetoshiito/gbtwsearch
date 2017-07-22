@@ -13,6 +13,10 @@ namespace WindowsFormsApp1
     public partial class Form1 : Form
     {
         Boolean flag = true;
+        // ★consumerKeyペアを設定する
+        String appKey = "consumerKey";
+        String appSKey = "consumerKeySecret";
+
         public Form1()
         {
             InitializeComponent();
@@ -45,7 +49,7 @@ namespace WindowsFormsApp1
 
             try
             {
-                var tokens = CoreTweet.Tokens.Create("9jz44UHH1Il3Pir09ihkl3Oc7", "04vcG5ZmG9ZCMaFH1wnfQ6tiUzIRVb6dAJBflYVooUr1Yy6mFu", Properties.Settings.Default.usertoken, Properties.Settings.Default.usertokenS);
+                var tokens = CoreTweet.Tokens.Create(appKey, appSKey, Properties.Settings.Default.usertoken, Properties.Settings.Default.usertokenS);
                 while (flag)
                 {
                     cnt++;
@@ -113,7 +117,7 @@ namespace WindowsFormsApp1
         {
             try
             {
-                session = CoreTweet.OAuth.Authorize("9jz44UHH1Il3Pir09ihkl3Oc7", "04vcG5ZmG9ZCMaFH1wnfQ6tiUzIRVb6dAJBflYVooUr1Yy6mFu");
+                session = CoreTweet.OAuth.Authorize(appKey, appSKey);
                 var url = session.AuthorizeUri; // -> user open in browser
                 textBox3.Text = "認証URLをクリップボードにコピーしました\r\n" +
                                 "ブラウザのURLバーにctrl+vで貼り付け\r\n" +
