@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -14,8 +15,8 @@ namespace WindowsFormsApp1
     {
         Boolean flag = true;
         // ★consumerKeyペアを設定する
-        String appKey = "consumerKey";
-        String appSKey = "consumerKeySecret";
+        String appKey = "Dummy";
+        String appSKey = "Dummy";
 
         public Form1()
         {
@@ -53,14 +54,33 @@ namespace WindowsFormsApp1
                 while (flag)
                 {
                     cnt++;
-                    var result = await tokens.Search.TweetsAsync(count => 1, q => keyword);
+                    var result = new CoreTweet.SearchResult();
+                    try
+                    {
+                        result = await tokens.Search.TweetsAsync(count => 1, q => keyword);
+                    }
+                    catch (Exception er)
+                    {
+                        Console.WriteLine(er.Message);
+                        continue;
+                    }
                     Console.WriteLine(result.Count);
                     foreach (var tweet in result)
                     {
+                        string nowbattleid = "";
                         Console.WriteLine("{0}: {1}",tweet.CreatedAt, tweet.Text);
-                        string[] a = tweet.Text.Split('\n');
-                        int s = a[0].IndexOf("参戦ID：");
-                        string nowbattleid = a[0].Substring(s + 5);
+                        System.Text.RegularExpressions.Regex r =
+                            new System.Text.RegularExpressions.Regex(
+                                @"[a-fA-F0-9]{8,8}",
+                                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                        System.Text.RegularExpressions.Match m = r.Match(tweet.Text);
+                        while (m.Success)
+                        {
+                            nowbattleid = m.Value;
+                            // 最初のヒットを利用
+                            break;
+                        }
                         if (battleid.Equals(nowbattleid))
                         {
                             break;
@@ -121,7 +141,7 @@ namespace WindowsFormsApp1
                 var url = session.AuthorizeUri; // -> user open in browser
                 textBox3.Text = "認証URLをクリップボードにコピーしました\r\n" +
                                 "ブラウザのURLバーにctrl+vで貼り付け\r\n" +
-                                "Twitter認証を行いPINコードを取得→入力→登録してちょ。\r\n" +
+                                "Twitter認証を行いPINコードを取得→入力→登録してください。\r\n" +
                                 url.AbsoluteUri;
                 Clipboard.SetText(url.AbsoluteUri);
             }
